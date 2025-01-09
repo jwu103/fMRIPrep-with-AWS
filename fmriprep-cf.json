@@ -1,0 +1,288 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "// Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved. \n // SPDX-License-Identifier: MIT-0",
+
+    "Parameters": {
+        "UniqueUserID": {
+          "NoEcho": "false",
+          "Description" : "An unique user ID used to identify all your resources",
+          "Type": "String",
+          "MinLength": "1",
+          "MaxLength": "16",
+          "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*"
+        }
+    },
+
+    "Resources":
+    {
+        "InputBucket":
+            {
+                "Type": "AWS::S3::Bucket",
+                "Properties": {
+                    "BucketName" : { "Fn::Join" : [ "-", ["fmriprep", "input", { "Ref" : "UniqueUserID" }]]},
+                    "AccessControl": "Private",
+                    "PublicAccessBlockConfiguration": {
+                        "BlockPublicPolicy": true,
+                        "BlockPublicAcls": true,
+                        "IgnorePublicAcls": true,
+                        "RestrictPublicBuckets": true
+                    }
+                },
+                "DeletionPolicy": "Delete"
+            },
+        "OutputBucket":
+            {
+                "Type": "AWS::S3::Bucket",
+                "Properties": {
+                    "BucketName" : { "Fn::Join" : [ "-", ["fmriprep", "output", { "Ref" : "UniqueUserID" }]]},
+                    "AccessControl": "Private",
+                    "PublicAccessBlockConfiguration": {
+                        "BlockPublicPolicy": true,
+                        "BlockPublicAcls": true,
+                        "IgnorePublicAcls": true,
+                        "RestrictPublicBuckets": true
+                    }
+                },
+                "DeletionPolicy": "Delete"
+            },
+        "LicenseBucket":
+            {
+                "Type": "AWS::S3::Bucket",
+                "Properties": {
+                    "BucketName" : { "Fn::Join" : [ "-", ["fmriprep", "freesurfer-license", { "Ref" : "UniqueUserID" }]]},
+                    "AccessControl": "Private",
+                    "PublicAccessBlockConfiguration": {
+                        "BlockPublicPolicy": true,
+                        "BlockPublicAcls": true,
+                        "IgnorePublicAcls": true,
+                        "RestrictPublicBuckets": true
+                    }
+                },
+                "DeletionPolicy": "Delete"
+            },
+
+        "FmriprepLambda": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "FunctionName": { "Fn::Join" : [ "-", ["fmriprep", "lambda", { "Ref" : "UniqueUserID" }]]},
+                "Handler": "fmriprep-lambda.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "Lambda2EC2Role",
+                        "Arn"
+                    ]
+                },
+                "Code": {
+                    "S3Bucket": "aws-blog-files",
+                    "S3Key": "fmriprep-lambda.py.zip"
+                },
+                "Runtime": "python3.13",
+                "Timeout": 20,
+                "TracingConfig": {
+                    "Mode": "Active"
+                },
+                "Environment": {
+                    "Variables": {"unique_user_id": { "Ref" : "UniqueUserID" }, 
+                                  "freesurfer_license_filename": "license.txt",
+                                  "folder_in_input_bucket": "bids",
+                                  "ami_id": "ami-0cb3e694642e383aa",
+                                  "instance_type": "m6a.2xlarge"
+                                }
+                    }
+            }
+        },
+
+        "EC2S3Role": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": { "Fn::Join" : [ "-", ["fmriprep", "EC2S3", { "Ref" : "UniqueUserID" }]]},
+                "AssumeRolePolicyDocument": {
+                    "Version" : "2012-10-17",
+                    "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": [ "ec2.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                } ]
+                },
+                "Path": "/",
+                "Policies": [ {
+                    "PolicyName": "S3",
+                    "PolicyDocument": {
+                        "Version" : "2012-10-17",
+                        "Statement": [ {
+                        "Effect": "Allow",
+                        "Action": "s3:*",
+                        "Resource": "*"
+                        } ]
+                    }
+                    } ]
+                }
+        },
+
+        "EC2S3InstanceProfile":{
+            "Type" : "AWS::IAM::InstanceProfile",
+            "Properties" : {
+                "InstanceProfileName": { "Fn::Join" : [ "-", ["fmriprep", "EC2S3", { "Ref" : "UniqueUserID" }]]},
+                "Path" : "/",
+                "Roles" : [{"Ref": "EC2S3Role"}]
+              }
+        },
+        
+        "Lambda2EC2Role": {
+        "Type" : "AWS::IAM::Role",
+        "Properties" : {
+            "RoleName": { "Fn::Join" : [ "-", ["fmriprep", "Lambda2EC2", { "Ref" : "UniqueUserID" }]]},
+            "AssumeRolePolicyDocument": {
+                "Version" : "2012-10-17",
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": [ "lambda.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                } ]
+                },
+            "Path": "/",
+            "Policies": [ {
+                    "PolicyName": "LambdaIAM",
+                    "PolicyDocument": {
+                        "Version" : "2012-10-17",
+                        "Statement": [
+                            {
+                                "Effect": "Allow",
+                                "Action": [
+                                    "iam:*",
+                                    "organizations:DescribeAccount",
+                                    "organizations:DescribeOrganization",
+                                    "organizations:DescribeOrganizationalUnit",
+                                    "organizations:DescribePolicy",
+                                    "organizations:ListChildren",
+                                    "organizations:ListParents",
+                                    "organizations:ListPoliciesForTarget",
+                                    "organizations:ListRoots",
+                                    "organizations:ListPolicies",
+                                    "organizations:ListTargetsForPolicy"
+                                ],
+                                "Resource": "*"
+                            }
+                        ]
+                    }
+                },
+
+                {
+                    "PolicyName": "LambdaXray",
+                    "PolicyDocument": 
+                    {
+                        "Version" : "2012-10-17",
+                        "Statement": [
+                            {
+                                "Resource": "*",
+                                "Action": [
+                                    "xray:PutTraceSegments",
+                                    "xray:PutTelemetryRecords"
+                                ],
+                                "Effect": "Allow"
+                            }
+                        ]
+                    }
+
+                },
+
+                {
+                    "PolicyName": "S3",
+                    "PolicyDocument": {
+                    "Version" : "2012-10-17",
+                    "Statement": [ {
+                        "Effect": "Allow",
+                        "Action": "s3:*",
+                        "Resource": "*"
+                    } ]
+                    }
+                },
+
+                {
+                    "PolicyName": "LambdaEC2",
+                    "PolicyDocument": {
+                        "Version" : "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": "ec2:*",
+                                "Effect": "Allow",
+                                "Resource": "*"
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "elasticloadbalancing:*",
+                                "Resource": "*"
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "cloudwatch:*",
+                                "Resource": "*"
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "autoscaling:*",
+                                "Resource": "*"
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "iam:CreateServiceLinkedRole",
+                                "Resource": "*",
+                                "Condition": {
+                                    "StringEquals": {
+                                        "iam:AWSServiceName": [
+                                            "autoscaling.amazonaws.com",
+                                            "ec2scheduled.amazonaws.com",
+                                            "elasticloadbalancing.amazonaws.com",
+                                            "spot.amazonaws.com",
+                                            "spotfleet.amazonaws.com",
+                                            "transitgateway.amazonaws.com"
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]}
+        },
+
+        "EC2SecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupName": { "Fn::Join" : [ "-", ["fmriprep", "EC2SG", { "Ref" : "UniqueUserID" }]]},
+                "GroupDescription" : "Allow ssh to client host",
+                "SecurityGroupIngress" : [{
+                    "IpProtocol" : "tcp",
+                    "FromPort" : 22,
+                    "ToPort" : 22,
+                    "CidrIp" : "0.0.0.0/0"
+                }]
+            }
+        }
+
+    },
+
+    "Outputs": {
+        "InputBucket": {
+            "Value": {"Ref": "InputBucket"},
+            "Description": "Input bucket name."
+        },
+        "OutputBucket": {
+            "Value": {"Ref": "OutputBucket"},
+            "Description": "Output bucket name."
+        },
+        "LicenseBucket": {
+            "Value": { "Ref": "LicenseBucket"},
+            "Description": "Freesurfer license bucket name."
+        },
+        "EC2InstanceProfile":{
+            "Value": {"Ref": "EC2S3InstanceProfile"},
+            "Description": "InstanceProfile for EC2 to read from & write to S3."
+        }
+    }
+}

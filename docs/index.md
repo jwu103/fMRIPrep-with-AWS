@@ -83,7 +83,8 @@ Wait for the installations to complete, and you should see the message as shown 
 4. After creating the AMI, don't forget to terminate the EC2 instance! Otherwise you will continue to be charged for it!<br>
 ![EC2_instance_terminate](images/EC2_instance_terminate.jpg)
 
-#### *Note: The AMI created from this illustration is kept. If you prefer not to create your own, you can use this AMI by referencing its ID: ```ami-0cb3e694642e383aa```.*
+#### *Note: The AMI created from this illustration is kept. If you prefer not to create your own, you can use this AMI by referencing its ID: ```ami-0cb3e694642e383aa```.*<br>
+<br>
 
 ### Update the CloudFormation setting
 At the time of writing this post, Python runtime 3.7 no longer seems to work for the Lambda function. Therefore, in order to set up all of the resources to run fMRIPrep on AWS as illustrated in the original AWS blog post, you need to either modify the Lambda function setting in Infrastructure Composer or modify the json file that the AWS blog post used.<br>

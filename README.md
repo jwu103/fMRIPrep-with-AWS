@@ -1,4 +1,4 @@
-# fMRIPrep-AWS
+# fMRIPrep-with-AWS
 How to set up an up-to-date fMRIPrep pipeline on AWS
 
 # Prologue

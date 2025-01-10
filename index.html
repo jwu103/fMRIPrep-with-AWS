@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Running the latest version of fMRIPrep with Amazon Web Service</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">Running the latest version of fMRIPrep with Amazon Web Service</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#fmriprep-aws" class="nav-link">fMRIPrep-AWS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#prologue" class="nav-link">Prologue</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#walkthrough" class="nav-link">Walkthrough</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#steps" class="nav-link">Steps</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#epilogue" class="nav-link">Epilogue</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="fmriprep-aws">fMRIPrep-AWS</h1>
+<p>How to set up an up-to-date fMRIPrep pipeline on AWS</p>
+<h1 id="prologue">Prologue</h1>
+<p>Thanks to Mingwen Dong and Mengxue Kang for their 2019 AWS Open Blog post on running fMRIPrep on AWS: <a href="https://aws.amazon.com/blogs/opensource/fmri-data-preprocessing-aws-fmriprep/">fMRI data preprocessing on AWS using fMRIprep</a>.</p>
+<p>This GitHub page builds upon their work, providing a step-by-step guide to setting up the latest fMRIPrep pipeline on AWS. Since the original AWS blog post was published, fMRIPrep has been updated to version 24.x (24.1.1 at the time of writing), incorporating many new features and improvements. Setting up the latest pipeline will allow you to use these enhancements in your analysis. </p>
+<h1 id="walkthrough">Walkthrough</h1>
+<p>The following section covers the procedures to set up an up-to-date FMRIPREP pipeline on AWS:
+1. <a href="https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-ec2-instance">Create an EC2 instance</a>
+2. <a href="https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-amazon-machine-image-from-the-ec2-instance">Create an Amazon Machine Image from the EC2 instance</a>
+3. <a href="https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#update-the-cloudformation-setting">Update the CloudFormation setting</a>
+4. <a href="https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#clean-up-and-voil%C3%A0">Clean up and voilà</a></p>
+<h2 id="steps">Steps</h2>
+<h3 id="create-an-ec2-instance">Create an EC2 instance</h3>
+<ol>
+<li>
+<p>Enter "EC2" into the AWS search bar and launch EC2 service.<br>
+<img alt="EC2_launch" src="images/EC2_launch.jpg" /></p>
+</li>
+<li>
+<p>Click "Launch instances" as shown on the top right corner.<br>
+<img alt="EC2_launch_instances" src="images/EC2_launch_instance.png" /></p>
+</li>
+<li>
+<p>Enter a name for the EC2 instance; I am using "fMRIPrep_base" as the name here.<br>
+<img alt="EC2_instance_name" src="images/EC2_instance_name.jpg" /></p>
+</li>
+<li>
+<p>Select Ubuntu as the operating system for the EC2 instance.<br>
+<img alt="EC2_instance_OS" src="images/EC2_instance_os.jpg" /></p>
+</li>
+<li>
+<p>Select an instance type for the EC2 instance. There are two factors that go into this decision: need and pricing. For fMRIPrep, the developers provide benchmarking data on the <a href="https://fmriprep.org/en/stable/faq.html#how-much-cpu-time-and-ram-should-i-allocate-for-a-typical-fmriprep-run">website</a>. I typically allocate 32 GB of ram and 8 CPUs when running fMRIPrep. For this illustration, I picked m6a.2xlarge as the instance type.<br>
+<img alt="EC2_instance_type" src="images/EC2_instance_type.jpg" /></p>
+</li>
+<li>
+<p>Select a Key pair. If you didn't have one, click "Create new key pair".<br>
+<img alt="EC2_instance_keypair" src="images/EC2_instance_keypair.jpg" /></p>
+</li>
+<li>
+<p>Configure the storage volume for the EC2 instance. I am using 30 GB in the illustration, but it's possible to use less.<br>
+<img alt="EC2_instance_storage" src="images/EC2_instance_storage.jpg" /></p>
+</li>
+<li>
+<p>Launch the instance. You should see a message as shown below. Then, click "Connect to instance".<br>
+<img alt="EC2_instance_success" src="images/EC2_instance_success.jpg" /></p>
+</li>
+<li>
+<p>Click "Connect" at the bottom right corner.<br>
+<img alt="EC2_instance_connect" src="images/EC2_instance_connect.jpg" /></p>
+</li>
+<li>
+<p>Afer connecting to the instance, there are three packages to install: <a href="https://docs.docker.com/engine/install/ubuntu/">Docker</a>, unzip, and <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">AWS Command Line Interface</a>. For ease, I've pasted the codes below. Copy the codes, and paste them into the instance, and then hit enter. When pasting, right click on the instance and select "paste".<br></p>
+</li>
+</ol>
+<pre><code class="language-bash">sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;) stable&quot; | \
+  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo apt install unzip
+curl &quot;https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip&quot; -o &quot;awscliv2.zip&quot;
+unzip awscliv2.zip
+sudo ./aws/install
+</code></pre>
+<p>Wait for the installations to complete, and you should see the message as shown below.<br>
+<img alt="EC2_instance_install" src="images/EC2_instance_install.jpg" /></p>
+<h4 id="note-as-you-may-notice-i-did-not-include-a-step-to-install-fmriprep-directly-into-this-ec2-instance-which-will-be-used-to-create-the-amazon-machine-image-this-is-because-i-generally-prefer-to-call-the-docker-package-in-the-docker-run-command-and-when-docker-cant-find-the-package-it-will-download-it-if-you-want-to-pre-install-fmriprep-here-please-make-sure-to-reference-the-correct-version-number-in-the-docker-run-command-in-the-lambda-function"><em>Note: As you may notice, I did not include a step to install fMRIPrep directly into this EC2 instance, which will be used to create the Amazon Machine Image. This is because I generally prefer to call the Docker package in the <code>docker run</code> command, and when Docker can't find the package, it will download it. If you want to pre-install fMRIPrep here, please make sure to reference the correct version number in the <code>docker run</code> command in the Lambda function.</em></h4>
+<h3 id="create-an-amazon-machine-image-from-the-ec2-instance">Create an Amazon Machine Image from the EC2 instance</h3>
+<ol>
+<li>
+<p>Go back to the EC2 dashboard page. Select the EC2 instance. Open the "Action" tab. Go to "Image and templates". Then, click "Create image". This will create an Amazon Machine Image using the EC2 instance.<br>
+<img alt="EC2_instance_createimage" src="images/EC2_instance_createimage.jpg" /></p>
+</li>
+<li>
+<p>Go through the process and you should see a message as shown below.<br>
+<img alt="AMI_creating" src="images/AMI_creating.jpg" /></p>
+</li>
+<li>
+<p>The process of creating the Amazon Machine Image can take a bit of time. You can navigate to the AMIs page under the Images tab on the left sidebar. If the <em>Status</em> of the AMI says "Pending", that means the Image is still being created. The process will be completed when the Status changes to "available".<br>
+<img alt="AMI_available" src="images/AMI_available.jpg" /></p>
+</li>
+<li>
+<p>After creating the AMI, don't forget to terminate the EC2 instance! Otherwise you will continue to be charged for it!<br>
+<img alt="EC2_instance_terminate" src="images/EC2_instance_terminate.jpg" /></p>
+</li>
+</ol>
+<h4 id="note-the-ami-created-from-this-illustration-is-kept-if-you-prefer-not-to-create-your-own-you-can-use-this-ami-by-referencing-its-id-ami-0cb3e694642e383aa"><em>Note: The AMI created from this illustration is kept. If you prefer not to create your own, you can use this AMI by referencing its ID: <code>ami-0cb3e694642e383aa</code>.</em></h4>
+<h3 id="update-the-cloudformation-setting">Update the CloudFormation setting</h3>
+<p>At the time of writing this post, Python runtime 3.7 no longer seems to work for the Lambda function. Therefore, in order to set up all of the resources to run fMRIPrep on AWS as illustrated in the original AWS blog post, you need to either modify the Lambda function setting in Infrastructure Composer or modify the json file that the AWS blog post used.<br></p>
+<p>For ease, I've modified the json file and uploaded to <a href="https://github.com/jwu103/FMRIPREP-AWS/blob/main/fmriprep-cf.json">this GitHub page</a>, as well as an S3 bucket. You can either download the json file, create the stack in CloudFormation by uploading the json file, or <a href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create?stackName=fmriprep&amp;templateURL=https://smallstorage62.s3.us-west-2.amazonaws.com/fmriprep-cf.json">create the stack by retrieving the json file from the S3 bucket</a>. If the hyperlink above doesn't work, you can copy the S3 link <code>https://smallstorage62.s3.us-west-2.amazonaws.com/fmriprep-cf.json</code> and paste it into the Amazon S3 URL field when you create the stack, and click Next.<br></p>
+<p>Here I will explain how to modify the Lambda function setting:</p>
+<ol>
+<li>
+<p>After pasting the S3 URL into the Amazon S3 URL field in CloudFormation or uploading the template json file, click "View in Infrastructure Composer".<br>
+<img alt="Infrastructure_composer" src="images/Infrastructure_composer.jpg" /></p>
+</li>
+<li>
+<p>Locate the FmriprepLambda component, and click "Details".<br>
+<img alt="Lambda_change" src="images/Lambda_change.jpg" /></p>
+</li>
+<li>
+<p>A window should appear on the right. In the window, you can change the version of the Python runtime, and environmental variables such as (a) the Amazon Machine Image that the fMRIPrep pipeline will use, (b) the EC2 instance type that the pipeline will use to perform the analysis, (c) the unique user ID, (d) the name of the freesurfer license, and (e) the name of the folder in the input S3 bucket that will contain the BIDS neuroimaging data.<br> 
+<img alt="python_runtime" src="images/python_runtime.jpg" />
+<img alt="Lambda_environmental_variable" src="images/Lambda_environmental_variable.jpg" /></p>
+</li>
+<li>
+<p>After you finish editing the Lambda function settings, save them and proceed.</p>
+</li>
+</ol>
+<h3 id="clean-up-and-voila">Clean up and voilà</h3>
+<p>Once you finish creating the stack using CloudFormation, you will have mostly everything you need to run the latest version of fMRIPrep on AWS! But since fMRIPrep has now moved to nipreps, you will need to modify the Lambda function to correctly call the Docker package. </p>
+<ol>
+<li>
+<p>Locate the line that starts with "docker run" in fmriprep-lambda.py. Change <code>poldracklab/fmriprep:latest</code> to <code>nipreps/fmriprep:latest</code>, or to <code>nipreps/fmriprep:&lt;version&gt;</code>.
+<img alt="Docker_function" src="images/Docker_function.jpg" /></p>
+</li>
+<li>
+<p>Click "Deploy" on the left side bar, or press Ctrl+Shift+U.</p>
+</li>
+<li>
+<p>Upload your freesurfer license to the freesurfer license S3 bucket, and your BIDS-formatted neuroimaging data to the bids folder in the input S3 Bucket. And now you are in business! Click the "Test" button on the Lambda function page or press Ctrl+Shift+I, and fMRIPrep will start running.
+<img alt="Docker_function" src="images/Docker_function.jpg" /></p>
+</li>
+</ol>
+<h1 id="epilogue">Epilogue</h1>
+<ol>
+<li>This is essential a guide on how to build an Amazon Machine Image with Docker and AWS preloaded, such that when the Lambda function is executed, the Docker image of your choice can be downloaded and run. The steps outlined on this GitHub page can also be generalized to set up other Docker packages, such as XCP-D (for resting-state denoising), qsiprep/qsirecon (for structural preprocessing and reconstruction), and fmripost-aroma (for ICA-AROMA denoising if using fMRIPrep version 23.1.0 or later). Also, it is possible to create a single Amazon Machine Image with one or multiple packages pre-loaded; you will just need to make sure the Lambda function is calling the correct versions of the packages that you installed on the AMI.</li>
+<li>I am neither a computer scientist nor an AWS expert. However, I once found myself struggling to figure out how to run analyze fMRI data for my research without access to local high-performance computing. My hope in writing this guide is that it might help someone who is facing a similar challenge some day. If you have any suggestions, please share!</li>
+<li>If you find this page helpful, I will humbly accept your donation in the form of a star on the <a href="https://github.com/jwu103/FMRIPREP-AWS">GitHub page</a>. ;)</li>
+<li>A Zen-dog picture for the road.<br> <p align="center"><img src="images/Peaceful_dog.jpeg" width="300"></p></li>
+</ol></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2025-01-10 02:09:19.923934+00:00
+-->

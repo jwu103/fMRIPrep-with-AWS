@@ -8,10 +8,10 @@ This GitHub page builds upon their work, providing a step-by-step guide to setti
 
 # Walkthrough
 The following section covers the procedures to set up an up-to-date FMRIPREP pipeline on AWS:
-1. [Create an EC2 instance](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-ec2-instance)
-2. [Create an Amazon Machine Image from the EC2 instance](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-amazon-machine-image-from-the-ec2-instance)
-3. [Update the CloudFormation setting](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#update-the-cloudformation-setting)
-4. [Clean up and voilà](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#clean-up-and-voil%C3%A0)
+1. [Create an EC2 instance](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-ec2-instance)<br>
+2. [Create an Amazon Machine Image from the EC2 instance](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#create-an-amazon-machine-image-from-the-ec2-instance)<br>
+3. [Update the CloudFormation setting](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#update-the-cloudformation-setting)<br>
+4. [Clean up and voilà](https://github.com/jwu103/FMRIPREP-AWS/tree/main?tab=readme-ov-file#clean-up-and-voil%C3%A0)<br>
 
 ## Steps
 ### Create an EC2 instance

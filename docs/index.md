@@ -67,7 +67,8 @@ sudo ./aws/install
 Wait for the installations to complete, and you should see the message as shown below.<br>
 ![EC2_instance_install](images/EC2_instance_install.jpg)
 
-#### *Note: As you may notice, I did not include a step to install fMRIPrep directly into this EC2 instance, which will be used to create the Amazon Machine Image. This is because I generally prefer to call the Docker package in the ```docker run``` command, and when Docker can't find the package, it will download it. If you want to pre-install fMRIPrep here, please make sure to reference the correct version number in the ```docker run``` command in the Lambda function.*
+#### *Note: As you may notice, I did not include a step to install fMRIPrep directly into this EC2 instance, which will be used to create the Amazon Machine Image. This is because I generally prefer to call the Docker package in the ```docker run``` command, and when Docker can't find the package, it will download it. If you want to pre-install fMRIPrep here, please make sure to reference the correct version number in the ```docker run``` command in the Lambda function.*<br>
+<br>
 
 ### Create an Amazon Machine Image from the EC2 instance
 1. Go back to the EC2 dashboard page. Select the EC2 instance. Open the "Action" tab. Go to "Image and templates". Then, click "Create image". This will create an Amazon Machine Image using the EC2 instance.<br>

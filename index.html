@@ -155,7 +155,8 @@ sudo ./aws/install
 </code></pre>
 <p>Wait for the installations to complete, and you should see the message as shown below.<br>
 <img alt="EC2_instance_install" src="images/EC2_instance_install.jpg" /></p>
-<h4 id="note-as-you-may-notice-i-did-not-include-a-step-to-install-fmriprep-directly-into-this-ec2-instance-which-will-be-used-to-create-the-amazon-machine-image-this-is-because-i-generally-prefer-to-call-the-docker-package-in-the-docker-run-command-and-when-docker-cant-find-the-package-it-will-download-it-if-you-want-to-pre-install-fmriprep-here-please-make-sure-to-reference-the-correct-version-number-in-the-docker-run-command-in-the-lambda-function"><em>Note: As you may notice, I did not include a step to install fMRIPrep directly into this EC2 instance, which will be used to create the Amazon Machine Image. This is because I generally prefer to call the Docker package in the <code>docker run</code> command, and when Docker can't find the package, it will download it. If you want to pre-install fMRIPrep here, please make sure to reference the correct version number in the <code>docker run</code> command in the Lambda function.</em></h4>
+<h4 id="note-as-you-may-notice-i-did-not-include-a-step-to-install-fmriprep-directly-into-this-ec2-instance-which-will-be-used-to-create-the-amazon-machine-image-this-is-because-i-generally-prefer-to-call-the-docker-package-in-the-docker-run-command-and-when-docker-cant-find-the-package-it-will-download-it-if-you-want-to-pre-install-fmriprep-here-please-make-sure-to-reference-the-correct-version-number-in-the-docker-run-command-in-the-lambda-function"><em>Note: As you may notice, I did not include a step to install fMRIPrep directly into this EC2 instance, which will be used to create the Amazon Machine Image. This is because I generally prefer to call the Docker package in the <code>docker run</code> command, and when Docker can't find the package, it will download it. If you want to pre-install fMRIPrep here, please make sure to reference the correct version number in the <code>docker run</code> command in the Lambda function.</em><br></h4>
+<p><br></p>
 <h3 id="create-an-amazon-machine-image-from-the-ec2-instance">Create an Amazon Machine Image from the EC2 instance</h3>
 <ol>
 <li>
@@ -175,7 +176,8 @@ sudo ./aws/install
 <img alt="EC2_instance_terminate" src="images/EC2_instance_terminate.jpg" /></p>
 </li>
 </ol>
-<h4 id="note-the-ami-created-from-this-illustration-is-kept-if-you-prefer-not-to-create-your-own-you-can-use-this-ami-by-referencing-its-id-ami-0cb3e694642e383aa"><em>Note: The AMI created from this illustration is kept. If you prefer not to create your own, you can use this AMI by referencing its ID: <code>ami-0cb3e694642e383aa</code>.</em></h4>
+<h4 id="note-the-ami-created-from-this-illustration-is-kept-if-you-prefer-not-to-create-your-own-you-can-use-this-ami-by-referencing-its-id-ami-0cb3e694642e383aa"><em>Note: The AMI created from this illustration is kept. If you prefer not to create your own, you can use this AMI by referencing its ID: <code>ami-0cb3e694642e383aa</code>.</em><br></h4>
+<p><br></p>
 <h3 id="update-the-cloudformation-setting">Update the CloudFormation setting</h3>
 <p>At the time of writing this post, Python runtime 3.7 no longer seems to work for the Lambda function. Therefore, in order to set up all of the resources to run fMRIPrep on AWS as illustrated in the original AWS blog post, you need to either modify the Lambda function setting in Infrastructure Composer or modify the json file that the AWS blog post used.<br></p>
 <p>For ease, I've modified the json file and uploaded to <a href="https://github.com/jwu103/FMRIPREP-AWS/blob/main/fmriprep-cf.json">this GitHub page</a>, as well as an S3 bucket. You can either download the json file, create the stack in CloudFormation by uploading the json file, or <a href="https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/create?stackName=fmriprep&amp;templateURL=https://smallstorage62.s3.us-west-2.amazonaws.com/fmriprep-cf.json">create the stack by retrieving the json file from the S3 bucket</a>. If the hyperlink above doesn't work, you can copy the S3 link <code>https://smallstorage62.s3.us-west-2.amazonaws.com/fmriprep-cf.json</code> and paste it into the Amazon S3 URL field when you create the stack, and click Next.<br></p>
@@ -301,5 +303,5 @@ sudo ./aws/install
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-01-10 02:09:19.923934+00:00
+Build Date UTC : 2025-01-10 02:24:08.724198+00:00
 -->
